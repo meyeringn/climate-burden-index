@@ -1,6 +1,6 @@
 # About the Author
 
-**Nick Meyering** is a civic technologist, Disabled transit advocate, and public policy practitioner based in Philadelphia, PA.
+**Nico Meyering** is a civic technologist, Disabled transit advocate, and public policy practitioner based in Philadelphia, PA.
 
 -----
 
@@ -27,14 +27,14 @@ The CBI is a data tool. But data tools are made by people, and people have stake
 
 -----
 
-## The “Vibe Coding for Climate Action” Portfolio
+## The Entire Portfolio
 
 The CBI is part of a larger portfolio of civic tech tools built at the intersection of climate, equity, and public infrastructure:
 
 - **SustAInable** — XGBoost heat illness risk prediction by ZIP code ([github.com/meyeringn/sustainable-heat](https://github.com/meyeringn/sustainable-heat))
 - **UpLift** — Predictive maintenance for transit accessibility infrastructure ([github.com/meyeringn/uplift-transit](https://github.com/meyeringn/uplift-transit))
 - **CanopyWatch** — Tree canopy equity dashboard for 36 Philadelphia neighborhoods ([meyeringn.github.io/canopy-watch](https://meyeringn.github.io/canopy-watch))
-- **Transit Carbon Calculator** — Emissions comparison tool for 11 Pennsylvania transit agencies
+- **Transit Carbon Calculator** — Emissions comparison tool for 11 Pennsylvania transit agencies ([meyeringn.github.io/transit-carbon-calculator](https://meyeringn.github.io/transit-carbon-calculator)
 - **VitalGrid** — Power outage vulnerability mapping for Philadelphia neighborhoods
 - **FloodRisk Philly** — Flood risk lookup tool for Philadelphia renters
 - **Climate Equity Policy Simulator** — AI-powered policy scoring across equity dimensions
