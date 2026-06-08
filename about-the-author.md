@@ -34,7 +34,7 @@ The CBI is part of a larger portfolio of civic tech tools built at the intersect
 - **SustAInable** — XGBoost heat illness risk prediction by ZIP code ([github.com/meyeringn/sustainable-heat](https://github.com/meyeringn/sustainable-heat))
 - **UpLift** — Predictive maintenance for transit accessibility infrastructure ([github.com/meyeringn/uplift-transit](https://github.com/meyeringn/uplift-transit))
 - **CanopyWatch** — Tree canopy equity dashboard for 36 Philadelphia neighborhoods ([meyeringn.github.io/canopy-watch](https://meyeringn.github.io/canopy-watch))
-- **Transit Carbon Calculator** — Emissions comparison tool for 11 Pennsylvania transit agencies ([meyeringn.github.io/transit-carbon-calculator](https://meyeringn.github.io/transit-carbon-calculator)
+- **Transit Carbon Calculator** — Emissions comparison tool for 11 Pennsylvania transit agencies ([meyeringn.github.io/transit-carbon-calculator](https://meyeringn.github.io/transit-carbon-calculator))
 - **VitalGrid** — Power outage vulnerability mapping for Philadelphia neighborhoods
 - **FloodRisk Philly** — Flood risk lookup tool for Philadelphia renters
 - **Climate Equity Policy Simulator** — AI-powered policy scoring across equity dimensions
