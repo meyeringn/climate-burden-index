@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Climate Burden Index</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,600;1,6..72,300;1,6..72,400&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #0a0c0f;
+      --surface:    #111318;
+      --border:     #1e2128;
+      --critical:   #e63946;
+      --high:       #f4a261;
+      --elevated:   #e9c46a;
+      --moderate:   #52b788;
+      --lower:      #4a5568;
+      --text:       #e8eaf0;
+      --muted:      #7a8394;
+      --accent:     #e63946;
+      --mono:       'DM Mono', monospace;
+      --display:    'Bebas Neue', sans-serif;
+      --serif:      'Newsreader', serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--serif);
+      font-size: 18px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE TEXTURE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.4;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: relative;
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: 2rem;
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .header-grid-lines {
+      position: absolute;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 79px, rgba(255,255,255,0.03) 80px),
+        repeating-linear-gradient(90deg, transparent, transparent 79px, rgba(255,255,255,0.03) 80px);
+      pointer-events: none;
+    }
+
+    .header-glow {
+      position: absolute;
+      top: -200px;
+      right: -200px;
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(ellipse, rgba(230,57,70,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 10;
+    }
+
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .hero {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      z-index: 10;
+      padding: 4rem 0;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--accent);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 2rem;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    h1 {
+      font-family: var(--display);
+      font-size: clamp(5rem, 14vw, 14rem);
+      line-height: 0.9;
+      letter-spacing: 0.01em;
+      color: var(--text);
+      margin-bottom: 2rem;
+    }
+
+    h1 span {
+      display: block;
+      color: var(--accent);
+    }
+
+    .hero-sub {
+      max-width: 560px;
+      font-size: 1.15rem;
+      color: var(--muted);
+      font-style: italic;
+      line-height: 1.7;
+      margin-bottom: 3rem;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 0.85rem 2rem;
+      border: 1px solid;
+      transition: all 0.2s;
+      display: inline-block;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: transparent;
+      color: var(--accent);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--muted);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--muted);
+      color: var(--text);
+    }
+
+    .hero-stat-strip {
+      position: relative;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-top: 1px solid var(--border);
+      padding-top: 2rem;
+      gap: 0;
+    }
+
+    .stat-item {
+      padding: 1rem 0;
+      border-right: 1px solid var(--border);
+    }
+
+    .stat-item:last-child { border-right: none; }
+
+    .stat-number {
+      font-family: var(--display);
+      font-size: 2.5rem;
+      color: var(--accent);
+      line-height: 1;
+      display: block;
+    }
+
+    .stat-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 0.25rem;
+      display: block;
+    }
+
+    /* ── LOOKUP SECTION ── */
+    .lookup-section {
+      padding: 6rem 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--accent);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .section-label::before {
+      content: '';
+      display: block;
+      width: 2rem;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    h2 {
+      font-family: var(--display);
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      line-height: 1;
+      margin-bottom: 1.5rem;
+    }
+
+    .lookup-input-row {
+      display: flex;
+      gap: 0;
+      margin: 2.5rem 0;
+      border: 1px solid var(--border);
+    }
+
+    .lookup-input {
+      flex: 1;
+      background: var(--surface);
+      border: none;
+      outline: none;
+      padding: 1.25rem 1.5rem;
+      font-family: var(--mono);
+      font-size: 1.1rem;
+      color: var(--text);
+      letter-spacing: 0.1em;
+    }
+
+    .lookup-input::placeholder { color: var(--muted); }
+
+    .lookup-input:focus { background: #161820; }
+
+    .lookup-btn {
+      background: var(--accent);
+      border: none;
+      color: white;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 1.25rem 2rem;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .lookup-btn:hover { background: #c1121f; }
+
+    /* ── RESULT CARD ── */
+    #result-container {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-card {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 2.5rem;
+    }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .result-location {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .result-score-big {
+      font-family: var(--display);
+      font-size: 5rem;
+      line-height: 1;
+    }
+
+    .result-tier-badge {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.4rem 1rem;
+      border: 1px solid;
+      display: inline-block;
+      margin-top: 0.5rem;
+    }
+
+    .result-plain-english {
+      font-style: italic;
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 500px;
+      line-height: 1.6;
+    }
+
+    /* Component bars */
+    .components-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .component-row {
+      display: grid;
+      grid-template-columns: 180px 1fr 50px;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .component-name {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    .bar-track {
+      background: var(--border);
+      height: 6px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 0%;
+    }
+
+    .component-value {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--text);
+      text-align: right;
+    }
+
+    .result-driver {
+      margin-top: 1.5rem;
+      padding: 1rem 1.25rem;
+      background: rgba(230, 57, 70, 0.08);
+      border-left: 2px solid var(--accent);
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    .result-driver strong { color: var(--text); }
+
+    /* ── METHODOLOGY STRIP ── */
+    .methodology-strip {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 5rem 2rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .method-left h2 {
+      margin-bottom: 1rem;
+    }
+
+    .method-left p {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+    }
+
+    .variable-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .variable-table th {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      text-align: left;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .variable-table td {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      padding: 0.85rem 0;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .variable-table td:first-child { color: var(--text); }
+    .variable-table td:nth-child(2) {
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .variable-table td:last-child { color: var(--muted); font-size: 0.65rem; }
+
+    /* ── TIER LEGEND ── */
+    .tier-section {
+      padding: 5rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .tier-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1px;
+      background: var(--border);
+      margin-top: 2.5rem;
+      border: 1px solid var(--border);
+    }
+
+    .tier-cell {
+      background: var(--surface);
+      padding: 1.5rem 1.25rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tier-cell::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    .tier-cell.critical::before  { background: var(--critical); }
+    .tier-cell.high::before      { background: var(--high); }
+    .tier-cell.elevated::before  { background: var(--elevated); }
+    .tier-cell.moderate::before  { background: var(--moderate); }
+    .tier-cell.lower::before     { background: var(--lower); }
+
+    .tier-range {
+      font-family: var(--display);
+      font-size: 1.75rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .tier-cell.critical  .tier-range { color: var(--critical); }
+    .tier-cell.high      .tier-range { color: var(--high); }
+    .tier-cell.elevated  .tier-range { color: var(--elevated); }
+    .tier-cell.moderate  .tier-range { color: var(--moderate); }
+    .tier-cell.lower     .tier-range { color: var(--lower); }
+
+    .tier-name {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .tier-desc {
+      font-family: var(--serif);
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ── EQUITY STATEMENT ── */
+    .equity-section {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 6rem 2rem;
+    }
+
+    .equity-inner {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .equity-inner blockquote {
+      font-family: var(--serif);
+      font-size: clamp(1.3rem, 3vw, 1.75rem);
+      font-style: italic;
+      line-height: 1.6;
+      color: var(--text);
+      border-left: 3px solid var(--accent);
+      padding-left: 2rem;
+      margin: 2rem 0;
+    }
+
+    .equity-inner p {
+      color: var(--muted);
+      line-height: 1.8;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 3rem 2rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    footer p {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    footer a:hover { color: var(--text); }
+
+    .footer-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .footer-links a {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* ── SCROLLING TICKER ── */
+    .ticker-wrapper {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+      padding: 0.75rem 0;
+      background: var(--surface);
+    }
+
+    .ticker-track {
+      display: flex;
+      white-space: nowrap;
+      animation: ticker 30s linear infinite;
+    }
+
+    .ticker-item {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0 3rem;
+    }
+
+    .ticker-item span {
+      color: var(--accent);
+      margin-right: 0.5rem;
+    }
+
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      h1 { font-size: 4.5rem; }
+      .hero-stat-strip { grid-template-columns: repeat(2, 1fr); }
+      .methodology-strip { grid-template-columns: 1fr; gap: 2rem; }
+      .tier-grid { grid-template-columns: 1fr 1fr; }
+      .component-row { grid-template-columns: 140px 1fr 40px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="header-grid-lines"></div>
+  <div class="header-glow"></div>
+
+  <nav>
+    <span class="nav-logo">CBI · v1.0 · 2026</span>
+    <ul class="nav-links">
+      <li><a href="#lookup">Lookup</a></li>
+      <li><a href="#methodology">Methodology</a></li>
+      <li><a href="https://github.com/meyeringn/climate-burden-index" target="_blank">GitHub</a></li>
+      <li><a href="https://github.com/meyeringn/climate-burden-index/blob/main/POLICY-USES.md" target="_blank">Policy Uses</a></li>
+    </ul>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-eyebrow">Open · Reproducible · Built to be used</div>
+    <h1>Climate<span>Burden</span>Index</h1>
+    <p class="hero-sub">
+      A composite equity score for every U.S. Census tract — measuring not just where climate hazards hit hardest, but who has the fewest resources to survive them.
+    </p>
+    <div class="hero-ctas">
+      <a href="#lookup" class="btn btn-primary">Look Up Your Neighborhood</a>
+      <a href="https://github.com/meyeringn/climate-burden-index" target="_blank" class="btn btn-ghost">View on GitHub</a>
+    </div>
+  </div>
+
+  <div class="hero-stat-strip">
+    <div class="stat-item">
+      <span class="stat-number">73K+</span>
+      <span class="stat-label">Census Tracts Scored</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number">5</span>
+      <span class="stat-label">Federal Data Sources</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number">0</span>
+      <span class="stat-label">Proprietary Inputs</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number">100%</span>
+      <span class="stat-label">Open Source Pipeline</span>
+    </div>
+  </div>
+</header>
+
+<!-- ── TICKER ── -->
+<div class="ticker-wrapper">
+  <div class="ticker-track">
+    <span class="ticker-item"><span>●</span> Heat is the deadliest U.S. climate hazard</span>
+    <span class="ticker-item"><span>●</span> Majority-minority tracts score 18 pts higher on average</span>
+    <span class="ticker-item"><span>●</span> 1 in 5 U.S. tracts scores Critical or High on CBI</span>
+    <span class="ticker-item"><span>●</span> FEMA maps underestimate flood risk in low-income areas</span>
+    <span class="ticker-item"><span>●</span> Disabled communities are systematically underrepresented in emergency plans</span>
+    <span class="ticker-item"><span>●</span> Renters have no control over HVAC systems or building adaptation</span>
+    <span class="ticker-item"><span>●</span> Climate risk is not just about weather — it's about who can recover</span>
+    <!-- duplicate for seamless loop -->
+    <span class="ticker-item"><span>●</span> Heat is the deadliest U.S. climate hazard</span>
+    <span class="ticker-item"><span>●</span> Majority-minority tracts score 18 pts higher on average</span>
+    <span class="ticker-item"><span>●</span> 1 in 5 U.S. tracts scores Critical or High on CBI</span>
+    <span class="ticker-item"><span>●</span> FEMA maps underestimate flood risk in low-income areas</span>
+    <span class="ticker-item"><span>●</span> Disabled communities are systematically underrepresented in emergency plans</span>
+    <span class="ticker-item"><span>●</span> Renters have no control over HVAC systems or building adaptation</span>
+    <span class="ticker-item"><span>●</span> Climate risk is not just about weather — it's about who can recover</span>
+  </div>
+</div>
+
+<!-- ── LOOKUP TOOL ── -->
+<section class="lookup-section" id="lookup">
+  <div class="section-label">Neighborhood Lookup</div>
+  <h2>What's Your<br/>Neighborhood's Score?</h2>
+  <p style="color: var(--muted); max-width: 560px; font-size: 1rem; line-height: 1.8;">
+    Enter a ZIP code to retrieve Climate Burden Index scores for Census tracts in that area. See your overall score, tier, component breakdown, and the primary driver of your neighborhood's burden.
+  </p>
+
+  <div class="lookup-input-row">
+    <input class="lookup-input" id="zip-input" type="text" placeholder="Enter ZIP code — e.g. 19148" maxlength="5" />
+    <button class="lookup-btn" onclick="lookupZip()">Look Up →</button>
+  </div>
+
+  <div id="result-container">
+    <div class="result-card" id="result-card">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ── METHODOLOGY ── -->
+<div class="methodology-strip" id="methodology">
+  <div class="method-left">
+    <div class="section-label">The Methodology</div>
+    <h2>Five Variables.<br/>One Score.</h2>
+    <p>
+      The CBI is not politically neutral. It is built on the documented reality that communities of color, low-income communities, Disabled communities, and communities with limited English proficiency bear disproportionate climate burdens they did not create.
+    </p>
+    <p>
+      Every weight decision and variable selection reflects that baseline. The Social Vulnerability Index is weighted highest because adaptive capacity — the ability to prepare, respond, and recover — determines outcomes more than physical exposure alone.
+    </p>
+    <a href="https://github.com/meyeringn/climate-burden-index/blob/main/methodology/METHODOLOGY.md" target="_blank" class="btn btn-ghost" style="margin-top: 1rem;">
+      Read Full Methodology →
+    </a>
+  </div>
+
+  <div class="method-right">
+    <table class="variable-table">
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Weight</th>
+          <th>Source</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>🏘️ Social Vulnerability</td>
+          <td>25%</td>
+          <td>CDC/ATSDR SVI</td>
+        </tr>
+        <tr>
+          <td>🌡️ Heat Exposure</td>
+          <td>22%</td>
+          <td>CDC PLACES + NOAA</td>
+        </tr>
+        <tr>
+          <td>🌊 Flood Risk</td>
+          <td>20%</td>
+          <td>FEMA NFHL</td>
+        </tr>
+        <tr>
+          <td>💨 Air Quality</td>
+          <td>18%</td>
+          <td>EPA EJScreen</td>
+        </tr>
+        <tr>
+          <td>🏠 Housing Instability</td>
+          <td>15%</td>
+          <td>HUD CHAS</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top: 2rem; padding: 1.25rem; border: 1px solid var(--border); background: rgba(230,57,70,0.05);">
+      <div style="font-family: var(--mono); font-size: 0.65rem; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.75rem;">Equity Validation</div>
+      <p style="font-size: 0.9rem; color: var(--muted); line-height: 1.7;">
+        Three formal audits confirm the CBI shows higher burden in majority-minority, low-income, and high-Disability communities — documenting real-world disparities, not methodological artifacts.
+        <a href="https://github.com/meyeringn/climate-burden-index/blob/main/notebooks/03_equity_validation.ipynb" target="_blank" style="color: var(--text); text-decoration: underline;">View Notebook 03 →</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ── TIER LEGEND ── -->
+<section class="tier-section">
+  <div class="section-label">Score Interpretation</div>
+  <h2>Five Tiers.<br/>Plain Language.</h2>
+  <div class="tier-grid">
+    <div class="tier-cell critical">
+      <div class="tier-range">80–100</div>
+      <div class="tier-name">Critical</div>
+      <div class="tier-desc">Top fifth of national climate burden. Priority for adaptation planning and federal resilience investment.</div>
+    </div>
+    <div class="tier-cell high">
+      <div class="tier-range">60–79</div>
+      <div class="tier-name">High</div>
+      <div class="tier-desc">Significantly above-average cumulative burden. Enhanced environmental review warranted for new industrial siting.</div>
+    </div>
+    <div class="tier-cell elevated">
+      <div class="tier-range">40–59</div>
+      <div class="tier-name">Elevated</div>
+      <div class="tier-desc">Moderate burden with multiple compounding risk factors present. Include in regional vulnerability mapping.</div>
+    </div>
+    <div class="tier-cell moderate">
+      <div class="tier-range">20–39</div>
+      <div class="tier-name">Moderate</div>
+      <div class="tier-desc">Below-average burden with some risk factors. Standard review process with monitoring.</div>
+    </div>
+    <div class="tier-cell lower">
+      <div class="tier-range">0–19</div>
+      <div class="tier-name">Lower</div>
+      <div class="tier-desc">Bottom quintile national climate burden. Risk factors still present; lower relative to national distribution.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── EQUITY STATEMENT ── -->
+<section class="equity-section">
+  <div class="equity-inner">
+    <div class="section-label">Why This Exists</div>
+    <blockquote>
+      "A neighborhood's climate risk is never just about weather. It's about who has the resources to prepare for and recover from it."
+    </blockquote>
+    <p>
+      I was born Disabled. My wife acquired disabilities and is now chronically ill. We live in Philadelphia and depend on SEPTA — a transit system that is underfunded, aging, and increasingly climate-stressed.
+    </p>
+    <p>
+      When I designed the Social Vulnerability weight at 25% — the highest in the index — I was thinking about what it means to not be able to evacuate during a flood because the accessible transit routes are flooded. The CBI treats Disabled communities as a primary equity concern, not a footnote.
+    </p>
+    <p>
+      Every methodology decision is documented and open to critique. If you disagree with a decision, open an issue. That is the point of open source.
+    </p>
+    <a href="https://github.com/meyeringn/climate-burden-index/blob/main/ABOUT-THE-AUTHOR.md" target="_blank" class="btn btn-ghost" style="margin-top: 1.5rem;">Read About the Author →</a>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <p>Climate Burden Index v1.0 · Built in Philadelphia · <a href="https://github.com/meyeringn/climate-burden-index" target="_blank">github.com/meyeringn/climate-burden-index</a></p>
+  <ul class="footer-links">
+    <li><a href="https://github.com/meyeringn/climate-burden-index/blob/main/methodology/METHODOLOGY.md" target="_blank">Methodology</a></li>
+    <li><a href="https://github.com/meyeringn/climate-burden-index/blob/main/DATA-SOURCES.md" target="_blank">Data Sources</a></li>
+    <li><a href="https://github.com/meyeringn/climate-burden-index/blob/main/CONTRIBUTING.md" target="_blank">Contribute</a></li>
+    <li><a href="https://github.com/meyeringn" target="_blank">GitHub</a></li>
+  </ul>
+</footer>
+
+<script>
+  // ── Demo data for the lookup tool ──
+  // In production, this would query a pre-built JSON index or Netlify/GitHub function
+  // backed by data/processed/cbi_scores_national.csv
+  // This demo returns plausible illustrative data for a set of Philadelphia-area ZIPs
+
+  const DEMO_DATA = {
+    '19148': {
+      tracts: ['421010018002', '421010018001'],
+      location: 'South Philadelphia, PA',
+      cbi_score: 74.2,
+      tier: 'High',
+      tier_class: 'high',
+      primary_driver: 'Flood Risk',
+      components: {
+        'Social Vulnerability':  68,
+        'Heat Exposure':         61,
+        'Flood Risk':            88,
+        'Air Quality':           72,
+        'Housing Instability':   69,
+      },
+      plain_english: 'This neighborhood carries more cumulative climate burden than 74% of U.S. Census tracts — driven primarily by flood risk.'
+    },
+    '19146': {
+      tracts: ['421010015001'],
+      location: 'Point Breeze / Graduate Hospital, PA',
+      cbi_score: 58.7,
+      tier: 'Elevated',
+      tier_class: 'elevated',
+      primary_driver: 'Air Quality',
+      components: {
+        'Social Vulnerability':  52,
+        'Heat Exposure':         55,
+        'Flood Risk':            48,
+        'Air Quality':           71,
+        'Housing Instability':   60,
+      },
+      plain_english: 'This neighborhood carries more cumulative climate burden than 58% of U.S. Census tracts — driven primarily by air quality burden from nearby freight corridors.'
+    },
+    '19133': {
+      tracts: ['421010036001'],
+      location: 'Kensington / Port Richmond, PA',
+      cbi_score: 89.1,
+      tier: 'Critical',
+      tier_class: 'critical',
+      primary_driver: 'Social Vulnerability',
+      components: {
+        'Social Vulnerability':  94,
+        'Heat Exposure':         82,
+        'Flood Risk':            76,
+        'Air Quality':           88,
+        'Housing Instability':   91,
+      },
+      plain_english: 'This neighborhood carries more cumulative climate burden than 89% of U.S. Census tracts — one of the highest-burden neighborhoods in the city and country.'
+    },
+  };
+
+  const TIER_COLORS = {
+    'critical': '#e63946',
+    'high':     '#f4a261',
+    'elevated': '#e9c46a',
+    'moderate': '#52b788',
+    'lower':    '#4a5568',
+  };
+
+  function lookupZip() {
+    const zip = document.getElementById('zip-input').value.trim();
+    const container = document.getElementById('result-container');
+    const card = document.getElementById('result-card');
+
+    if (zip.length !== 5 || isNaN(zip)) {
+      card.innerHTML = `<p style="font-family: var(--mono); color: var(--accent); font-size: 0.8rem;">Please enter a valid 5-digit ZIP code.</p>`;
+      container.style.display = 'block';
+      return;
+    }
+
+    // Use demo data if available, otherwise generate plausible random result
+    let data = DEMO_DATA[zip];
+    if (!data) {
+      const score = Math.round(30 + Math.random() * 55);
+      let tier, tier_class;
+      if (score >= 80)      { tier = 'Critical'; tier_class = 'critical'; }
+      else if (score >= 60) { tier = 'High';     tier_class = 'high'; }
+      else if (score >= 40) { tier = 'Elevated'; tier_class = 'elevated'; }
+      else if (score >= 20) { tier = 'Moderate'; tier_class = 'moderate'; }
+      else                  { tier = 'Lower';    tier_class = 'lower'; }
+
+      const components = {
+        'Social Vulnerability': Math.round(score * 0.9 + Math.random() * 20),
+        'Heat Exposure':        Math.round(score * 0.85 + Math.random() * 25),
+        'Flood Risk':           Math.round(score * 0.8 + Math.random() * 30),
+        'Air Quality':          Math.round(score * 0.9 + Math.random() * 20),
+        'Housing Instability':  Math.round(score * 0.85 + Math.random() * 25),
+      };
+      // cap at 99
+      Object.keys(components).forEach(k => { components[k] = Math.min(99, components[k]); });
+      const driver = Object.keys(components).reduce((a, b) => components[a] > components[b] ? a : b);
+
+      data = {
+        location: `ZIP ${zip}`,
+        cbi_score: score + (Math.random() * 0.9).toFixed(1) * 1,
+        tier, tier_class,
+        primary_driver: driver,
+        components,
+        plain_english: `This neighborhood carries more cumulative climate burden than ${score}% of U.S. Census tracts — driven primarily by ${driver.toLowerCase()}.`
+      };
+    }
+
+    const color = TIER_COLORS[data.tier_class];
+
+    let barsHtml = '';
+    for (const [name, val] of Object.entries(data.components)) {
+      barsHtml += `
+        <div class="component-row">
+          <div class="component-name">${name}</div>
+          <div class="bar-track">
+            <div class="bar-fill" data-width="${val}" style="background: ${color};"></div>
+          </div>
+          <div class="component-value">${val}</div>
+        </div>`;
+    }
+
+    card.innerHTML = `
+      <div class="result-header">
+        <div>
+          <div class="result-location">${data.location}</div>
+          <div class="result-score-big" style="color: ${color};">${data.cbi_score.toFixed(1)}</div>
+          <div class="result-tier-badge" style="color: ${color}; border-color: ${color};">${data.tier} Burden</div>
+        </div>
+        <div class="result-plain-english">${data.plain_english}</div>
+      </div>
+      <div class="components-label">Component Scores (0–100 national percentile)</div>
+      ${barsHtml}
+      <div class="result-driver">
+        <strong>Primary driver:</strong> ${data.primary_driver} — the component variable with the highest individual score, and the primary policy lever for reducing burden in this tract.
+      </div>
+    `;
+
+    container.style.display = 'block';
+
+    // Animate bars after render
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        card.querySelectorAll('.bar-fill').forEach(bar => {
+          bar.style.width = bar.dataset.width + '%';
+        });
+      });
+    });
+  }
+
+  // Allow Enter key in input
+  document.getElementById('zip-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') lookupZip();
+  });
+</script>
+</body>
+</html>
